@@ -7,3 +7,15 @@ python3 driver_ingest.py \
   --url "https://docs.stripe.com/payments/checkout" \  (URL)
   --question "How do I build a payments page with Stripe Checkout?" \ (question)
   --top_k 5 (Chunks)
+i have broken up the driver where you can build a persistant ingest store here is how you do it(code in driver_ingest_parms.py)
+python chroma_ingest_kb.py \
+  --kb_id stripe_docs \
+  urllist \
+  --url_list stripe_urls.txt  (this is the file that contains all the URLs)
+  You can now query the file (driver_query_parms.py)
+  python driver_query_parms.py \
+  --question "How do I build a payments page with Stripe Checkout?" \
+  --kb_id stripe_docs \
+  --top_k 5
+  So we have broken up the driver into ingest and query (not sure if driver_ingest_parm.py will work anymore)
+  
