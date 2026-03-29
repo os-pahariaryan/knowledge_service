@@ -5,6 +5,7 @@ from fastapi import FastAPI, HTTPException
 from pydantic import BaseModel
 from typing import Optional, List
 import chromadb
+from chromadb.utils import embedding_functions
 from openai import OpenAI, OpenAIError, RateLimitError
 import asyncio
 import uuid
@@ -12,14 +13,24 @@ import os
 from dotenv import load_dotenv
 from crawl4ai import AsyncWebCrawler
 from crawl4ai.extraction_strategy import NoExtractionStrategy
-
 load_dotenv()
 
 app = FastAPI(title="Knowledge Service POC")
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
-chroma_client = chromadb.Client()
-collection = chroma_client.create_collection("knowledge_poc")
+CHROMA_PATH = os.getenv("CHROMA_PATH", "./chroma_db")
+COLLECTION_NAME = os.getenv("CHROMA_COLLECTION_NAME", "kb_chunks")
+
+# Use the same persistent Chroma store as the ingest script
+chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
+openai_ef = embedding_functions.OpenAIEmbeddingFunction(
+    api_key=os.getenv("OPENAI_API_KEY"),
+    model_name="text-embedding-3-small",
+)
+collection = chroma_client.get_or_create_collection(
+    name=COLLECTION_NAME,
+    embedding_function=openai_ef,
+)
 
 # ─────────────────────────────────────────
 # MODELS

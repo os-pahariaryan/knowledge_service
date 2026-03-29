@@ -1,0 +1,12 @@
+# Core Stripe docs home
+https://docs.stripe.com
+
+# Payments overview and key flows
+https://docs.stripe.com/payments
+https://docs.stripe.com/payments/checkout
+https://docs.stripe.com/payment-links
+https://docs.stripe.com/payments/elements
+
+# API reference and tour
+https://docs.stripe.com/api
+https://docs.stripe.com/payments-api/tour
