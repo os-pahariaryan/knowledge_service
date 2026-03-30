@@ -1,0 +1,110 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Knowledge Query UI</title>
+  <style>
+    body { font-family: system-ui, sans-serif; max-width: 800px; margin: 2rem auto; }
+    label { font-weight: 600; display: block; margin-top: 1rem; }
+    textarea { width: 100%; }
+    input, select { width: 200px; }
+    button { margin-top: 1rem; }
+    #answer, #sources { white-space: pre-wrap; border: 1px solid #ddd; padding: 1rem; margin-top: 1rem; }
+  </style>
+</head>
+<body>
+  <h1>Knowledge Query</h1>
+
+  <!-- 1. KB ID dropdown -->
+  <label for="kbId">Knowledge Base (kb_id)</label>
+  <select id="kbId"></select>
+
+  <!-- 2. Number of chunks (top_k) -->
+  <label for="topK">Number of chunks (top_k)</label>
+  <input id="topK" type="number" value="5" min="1" max="20" />
+
+  <!-- 3. Query box -->
+  <label for="question">Question</label>
+  <textarea id="question" rows="4" placeholder="Type your question..."></textarea>
+
+  <button id="askBtn">Ask</button>
+
+  <h2>Answer</h2>
+  <div id="answer"></div>
+
+  <h3>Sources</h3>
+  <div id="sources"></div>
+
+  <script>
+    const kbEl = document.getElementById("kbId");
+    const topKEl = document.getElementById("topK");
+    const qEl = document.getElementById("question");
+    const btn = document.getElementById("askBtn");
+    const ansEl = document.getElementById("answer");
+    const srcEl = document.getElementById("sources");
+
+    // Load kb_ids into dropdown
+    async function loadKbIds() {
+      try {
+        const resp = await fetch("http://localhost:8000/kb_ids");
+        if (!resp.ok) {
+          throw new Error("HTTP " + resp.status);
+        }
+        const data = await resp.json();
+        const kbIds = data.kb_ids || ["default"];
+
+        kbEl.innerHTML = "";
+        kbIds.forEach((id) => {
+          const opt = document.createElement("option");
+          opt.value = id;
+          opt.textContent = id;
+          kbEl.appendChild(opt);
+        });
+      } catch (e) {
+        // Fallback: single default option
+        kbEl.innerHTML = "";
+        const opt = document.createElement("option");
+        opt.value = "default";
+        opt.textContent = "default";
+        kbEl.appendChild(opt);
+      }
+    }
+
+    // Call /query when button is clicked
+    btn.addEventListener("click", async () => {
+      const question = qEl.value.trim();
+      if (!question) return;
+
+      const kb_id = kbEl.value || "default";
+      const top_k = parseInt(topKEl.value || "5", 10);
+
+      ansEl.textContent = "Thinking...";
+      srcEl.textContent = "";
+
+      try {
+        const resp = await fetch("http://localhost:8000/query", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ question, kb_id, top_k }),
+        });
+
+        if (!resp.ok) {
+          ansEl.textContent = "Error: " + resp.status + " " + resp.statusText;
+          return;
+        }
+
+        const data = await resp.json();
+        ansEl.textContent = data.answer || "";
+        if (Array.isArray(data.sources)) {
+          srcEl.textContent = data.sources.join("\n");
+        }
+      } catch (err) {
+        ansEl.textContent = "Request failed: " + err;
+      }
+    });
+
+    // Load kb_ids on page load
+    loadKbIds();
+  </script>
+</body>
+</html>
