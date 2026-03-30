@@ -18,4 +18,5 @@ python chroma_ingest_kb.py \
   --kb_id stripe_docs \
   --top_k 5
   So we have broken up the driver into ingest and query (not sure if driver_ingest_parm.py will work anymore)
-  
+  Added kb_id (knowledge id on the vector database chroma) endpoint on the server
+  you can use index.html to do the knowledge query
