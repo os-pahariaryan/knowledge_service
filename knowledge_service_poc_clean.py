@@ -2,8 +2,9 @@
 # knowledge_service_poc_clean.py
 
 from fastapi import FastAPI, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
-from typing import Optional, List
+from typing import Optional, List,Set
 import chromadb
 from chromadb.utils import embedding_functions
 from openai import OpenAI, OpenAIError, RateLimitError
@@ -16,6 +17,14 @@ from crawl4ai.extraction_strategy import NoExtractionStrategy
 load_dotenv()
 
 app = FastAPI(title="Knowledge Service POC")
+
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],      # ok for local dev
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 CHROMA_PATH = os.getenv("CHROMA_PATH", "./chroma_db")
@@ -272,6 +281,23 @@ ANSWER:"""
 # ENDPOINTS
 # ─────────────────────────────────────────
 
+@app.get("/kb_ids")
+async def list_kb_ids():
+    """Return all distinct kb_id values in the collection."""
+    data = collection.get(include=["metadatas"])
+    kb_ids: Set[str] = set()
+
+    for meta in data.get("metadatas", []):
+        if not meta:
+            continue
+        kb = meta.get("kb_id")
+        if kb:
+            kb_ids.add(kb)
+
+    if "default" not in kb_ids:
+        kb_ids.add("default")
+
+    return {"kb_ids": sorted(kb_ids)}
 @app.post("/ingest/url")
 async def ingest_url(request: IngestURLRequest):
     """Ingest a single URL — handles JS rendered pages"""
