@@ -1,3 +1,12 @@
+---
+title: Knowledge Demo
+emoji: 📚
+colorFrom: blue
+colorTo: green
+sdk: docker
+app_port: 7860
+---
+
 create a .openai_config.json (just fill in the open AI secret key between the quotes after you have generated it.
 If you are using something else you may have to change code (as openAI key is set in the env is set by write_env_from_openai_config2.py code)
 run Start_server.sh it will bring up the server in the background (and log in server.log)

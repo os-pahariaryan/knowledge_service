@@ -46,7 +46,7 @@
     // Load kb_ids into dropdown
     async function loadKbIds() {
       try {
-        const resp = await fetch("http://localhost:8000/kb_ids");
+        const resp = await fetch("https://pahariomnisavanataryan-knowledge-demo.hf.space/kb_ids");
         if (!resp.ok) {
           throw new Error("HTTP " + resp.status);
         }
@@ -82,7 +82,7 @@
       srcEl.textContent = "";
 
       try {
-        const resp = await fetch("http://localhost:8000/query", {
+        const resp = await fetch("https://pahariomnisavanataryan-knowledge-demo.hf.space/query", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
           body: JSON.stringify({ question, kb_id, top_k }),
