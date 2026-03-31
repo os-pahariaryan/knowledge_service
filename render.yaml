@@ -1,0 +1,22 @@
+services:
+  # This configures a Render Web Service
+  - type: web
+    name: knowledge-service-api
+    # Defining it as 'docker' tells Render to use the Dockerfile
+    env: docker
+    plan: starter # Starter or standard is recommended to give crawl4ai enough memory
+    
+    # We define the ENV vars but leave the values blank
+    # You will fill these out securely in the Render Dashboard
+    envVars:
+      - key: OPENAI_API_KEY
+        sync: false
+      - key: CHROMA_API_KEY
+        sync: false
+      - key: CHROMA_TENANT
+        sync: false
+      - key: CHROMA_DATABASE
+        sync: false
+      # Tell FastAPI what port to expose on Render
+      - key: PORT
+        value: 8000

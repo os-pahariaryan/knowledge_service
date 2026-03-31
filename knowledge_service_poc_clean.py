@@ -30,8 +30,13 @@ openai_client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 CHROMA_PATH = os.getenv("CHROMA_PATH", "./chroma_db")
 COLLECTION_NAME = os.getenv("CHROMA_COLLECTION_NAME", "kb_chunks")
 
-# Use the same persistent Chroma store as the ingest script
-chroma_client = chromadb.PersistentClient(path=CHROMA_PATH)
+# Use CloudClient if credentials are found, otherwise fallback to local
+
+chroma_client = chromadb.CloudClient(
+    api_key=os.getenv("CHROMA_API_KEY"),
+    tenant=os.getenv("CHROMA_TENANT"),
+    database=os.getenv("CHROMA_DATABASE")
+)
 openai_ef = embedding_functions.OpenAIEmbeddingFunction(
     api_key=os.getenv("OPENAI_API_KEY"),
     model_name="text-embedding-3-small",
