@@ -19,8 +19,8 @@ RUN playwright install --with-deps chromium
 # Copy the actual application files
 COPY . .
 
-# Standard FastAPI port
-EXPOSE 8000
+# Hugging Face Spaces expects port 7860
+EXPOSE 7860
 
-# Start Uvicorn, listening on all interfaces. Render automatically maps the PORT.
-CMD ["sh", "-c", "uvicorn knowledge_service_poc_clean:app --host 0.0.0.0 --port ${PORT:-8000}"]
+# Start Uvicorn on port 7860 for Hugging Face Spaces
+CMD ["uvicorn", "knowledge_service_poc_clean:app", "--host", "0.0.0.0", "--port", "7860"]
